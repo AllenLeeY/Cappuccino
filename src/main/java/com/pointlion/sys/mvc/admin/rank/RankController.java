@@ -1,9 +1,4 @@
-/**
- * @author Lion
- * @date 2017年1月24日 下午12:02:35
- * @qq 439635374
- */
-package com.pointlion.sys.mvc.admin.org;
+package com.pointlion.sys.mvc.admin.rank;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,16 +15,19 @@ import com.pointlion.sys.mvc.common.dto.ZtreeNode;
 import com.pointlion.sys.mvc.common.model.SysOrg;
 import com.pointlion.sys.mvc.common.utils.UuidUtil;
 
-/***
- * 菜单管理控制器
+/**
+ * @ClassName:  OrgController   
+ * @Description:TODO(岗位管理控制器)   
+ * @author LiYonghui
+ * @date 2018年4月8日 上午11:14:12
  */
 @Before(MainPageTitleInterceptor.class)
-public class OrgController extends BaseController {
+public class RankController extends BaseController {
 	/***
 	 * 获取列表页面
 	 */
 	public void getListPage(){
-    	render("/WEB-INF/admin/org/list.html");
+    	render("/WEB-INF/admin/post/list.html");
     }
     /***
      * 获取树
@@ -41,7 +39,7 @@ public class OrgController extends BaseController {
     	//声明根节点
     	ZtreeNode root = new ZtreeNode();
     	root.setId("#root");
-    	root.setName("组织结构");
+    	root.setName("公司部门组织结构");
     	root.setChildren(nodelist);
     	root.setOpen(true);
     	rootList.add(root);
@@ -54,7 +52,7 @@ public class OrgController extends BaseController {
     	//声明根节点
     	ZtreeNode root = new ZtreeNode();
     	root.setId("#root");
-    	root.setName("组织结构");
+    	root.setName("公司部门组织结构");
     	root.setChildren(nodelist);
     	root.setOpen(true);
     	root.setNocheck(true);

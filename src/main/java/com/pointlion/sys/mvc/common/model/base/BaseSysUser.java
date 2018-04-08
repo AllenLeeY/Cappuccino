@@ -73,6 +73,15 @@ public abstract class BaseSysUser<M extends BaseSysUser<M>> extends Model<M> imp
 		return get("orgid");
 	}
 
+	public void setPostid(java.lang.String postid) {
+		set("postid", postid);
+	}
+
+	public java.lang.String getPostid() {
+		return get("postid");
+	}
+
+	
 	public void setStationid(java.lang.String stationid) {
 		set("stationid", stationid);
 	}
