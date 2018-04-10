@@ -1,4 +1,4 @@
-# JFinalOA
+# 嘟嘟
 本项目根据：https://gitee.com/glorylion/JFinalOA.git 重构，作者开发的项目真的不错，而且能够分享出来。但由于数据库建表语句出现很多错误，
 我修改了好长时间，终于部署成功。并把新的sql语句提交上去。
 
