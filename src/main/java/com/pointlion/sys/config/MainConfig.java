@@ -32,6 +32,7 @@ import com.pointlion.sys.mvc.admin.menu.MenuController;
 import com.pointlion.sys.mvc.admin.notice.NoticeController;
 import com.pointlion.sys.mvc.admin.org.OrgController;
 import com.pointlion.sys.mvc.admin.post.PostController;
+import com.pointlion.sys.mvc.admin.rank.RankController;
 import com.pointlion.sys.mvc.admin.resget.OaResGetController;
 import com.pointlion.sys.mvc.admin.role.RoleController;
 import com.pointlion.sys.mvc.admin.upload.UploadController;
@@ -142,6 +143,7 @@ public class MainConfig extends JFinalConfig {
 		me.add("/admin/home", HomeController.class);//首页
 		me.add("/admin/org", OrgController.class);//组织架构
 		me.add("/admin/post", PostController.class);//岗位
+		me.add("/admin/rank", RankController.class);//岗位
 		me.add("/admin/chat",ChatController.class);//即时聊天
 		me.add("/admin/cms",CmsController.class);//内容管理
 		me.add("/admin/user", UserController.class);//用户

@@ -22,6 +22,8 @@ public class _MappingKit {
 		arp.addMapping("sys_role", "id", SysRole.class);//角色
 		arp.addMapping("sys_role_auth", "id", SysRoleAuth.class);//角色对应功能权限
 		arp.addMapping("sys_org", "id", SysOrg.class);//组织结构
+		arp.addMapping("sys_post", "id", SysPost.class);//岗位
+		arp.addMapping("sys_rank", "id", SysRank.class);//职级
 		arp.addMapping("sys_friend", "id", SysFriend.class);//用户好友
 		arp.addMapping("oa_notice", "id", OaNotice.class);
 		arp.addMapping("oa_notice_user", "id", OaNoticeUser.class);

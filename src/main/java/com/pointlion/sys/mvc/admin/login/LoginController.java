@@ -89,6 +89,7 @@ public class LoginController extends BaseController {
             }else{
             	subject.login(token);
             }
+            SessionUtil.setUserIdToSession(this.getRequest(), ShiroKit.getUserId());
             //调转到主页面
             this.redirect("/admin/home");
         }catch (IncorrectCaptchaException e) {

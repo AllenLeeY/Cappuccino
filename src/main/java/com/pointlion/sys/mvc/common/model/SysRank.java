@@ -1,7 +1,8 @@
 package com.pointlion.sys.mvc.common.model;
 
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
@@ -9,8 +10,6 @@ import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.activerecord.tx.Tx;
-import com.pointlion.sys.mvc.common.dto.ZtreeNode;
-import com.pointlion.sys.mvc.common.model.base.BaseSysOrg;
 import com.pointlion.sys.mvc.common.model.base.BaseSysRank;
 
 /**
@@ -39,4 +38,28 @@ public class SysRank extends BaseSysRank<SysRank> {
     	}
 	}
 	
+	/***
+	 * 分页查询
+	 * @param id
+	 * @return
+	 */
+	public Page<Record> getPage(int pnum,int psize){
+		String sql = "from sys_rank r left join sys_user u on r.create_user=u.id left join sys_user u2 on r.update_user=u2.id order by create_time desc ";
+		return Db.paginate(pnum, psize, "select r.*,u.name createUser,u2.name updateUser ", sql);
+	}
+	
+	/***
+	 * 查询职级的Map键值对数据
+	 * @return map
+	 */
+	public Map<String,String> getAll(){
+		Map<String,String> map = new LinkedHashMap<String,String>();
+		List<Record> records = Db.find("select * from sys_rank r order by namecode");
+		for(Record r: records) {
+			String id = r.getStr("id");
+			String name = r.getStr("name");
+			map.put(id, name);
+		}
+		return map;
+	}
 }

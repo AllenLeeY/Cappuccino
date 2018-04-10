@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 public class SessionUtil {
 	public static String usernameKey = "username";
+	public static String useridKey = "userid";
 	/***
 	 * 设置用户名--登录名
 	 * @param req
@@ -15,6 +16,14 @@ public class SessionUtil {
 	} 
 	public static String getUsernameFromSession(HttpServletRequest req){
 		return req.getSession().getAttribute(usernameKey).toString();
+	}
+	
+	public static void setUserIdToSession(HttpServletRequest req,String userid){
+		req.getSession().setAttribute(useridKey, userid);
+	} 
+	
+	public static String getUserIdFromSession(HttpServletRequest req){
+		return req.getSession().getAttribute(useridKey).toString();
 	}
 	
 }

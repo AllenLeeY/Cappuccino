@@ -54,6 +54,13 @@ public class SysUser extends BaseSysUser<SysUser> {
 	public List<SysUser> getUserListByOrgId(String orgid){
 		return SysUser.dao.find("SELECT * from sys_user u where u.orgid='"+orgid+"'");
 	}
+	
+	/***
+	 * 根据岗位下所有用户
+	 */
+	public List<SysUser> getUserListByPostId(String postid){
+		return SysUser.dao.find("SELECT * from sys_user u where u.postid='"+postid+"'");
+	}
 	/***
 	 * 获取分页
 	 */

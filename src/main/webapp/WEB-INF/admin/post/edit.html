@@ -3,16 +3,16 @@
 			<div class="col-lg-12">
 		        <div class="panel">
 		            <div class="panel-heading">
-		                <h3 class="panel-title">添加新岗位</h3>
+		                <h3 class="panel-title">岗位添加/编辑</h3>
 		            </div>
 		            <form id="editForm" class="panel-body form-horizontal form-padding">
+		            	<input type="hidden"  name="sysPost.id" class="form-control"  value="#(post?post.id:'')">
 		            	<div class="form-group">
 		                    <label class="col-md-3 control-label" for="demo-text-input">组织架构</label>
 		                    <div class="col-md-5">
 		                        <div class="input-group mar-btm">
-			                        <input type="text" id="orgName" value="#(org.name?org.name:'根目录')" readonly class="form-control">
-									<input type="hidden" id = "orgId" name="sysPost.orgid" value="#(post?post.orgid:'')">
-			                        
+			                        <input type="text" id="orgName" name="orgName" value="#(org?org.name:rootOrg.name)" readonly class="form-control">
+									<input type="hidden" id = "orgId" name="sysPost.orgid" value="#(post?post.orgid:rootOrg.id)">
 			                        <span class="input-group-btn">
 			                            <button class="btn btn-mint" type="button" onclick="selectOneOrg()">选择</button>
 			                        </span>
@@ -24,21 +24,24 @@
 		                    <label class="col-md-3 control-label" for="demo-text-input">岗位名称</label>
 		                    <div class="col-md-9">
 		                        <input type="text"  name="sysPost.name" class="form-control"  value="#(post?post.name:'')">
-		                        <small class="help-block">请输入机构名称</small>
+		                        <small class="help-block">请输入岗位名称</small>
 		                    </div>
 		                </div>
-		                <div class="form-group">
-		                    <label class="col-md-3 control-label" for="demo-textarea-input">描述信息</label>
-		                    <div class="col-md-9">
-		                        <textarea name="sysPost.description" rows="9" class="form-control">#(post?post.description:'')</textarea>
-		                        <small class="help-block">请输入机构的描述信息</small>
+		                 <div class="form-group">
+		                   <label class="col-md-3 control-label" for="demo-text-input">所属职级</label>
+		                    <div class="col-md-5">
+		                        <div class="input-group mar-btm">
+			                       <select name="sysPost.rankid" data-width="400px"  class="form-control selectpicker show-tick" id="rankid" data-live-search="true">
+									</select>
+									<input type="hidden"  name="rankid" class="form-control"  value="#(post?post.rankid:'')">
+			                    </div>
 		                    </div>
 		                </div>
 		                <div class="form-group">
 		                    <label class="col-md-3 control-label" for="demo-text-input">显示顺序</label>
 		                    <div class="col-md-4">
 		                        <input type="text" name="sysPost.sort" class="form-control" value="#(post?post.sort:'')">
-		                        <small class="help-block">请输入机构显示顺序</small>
+		                        <small class="help-block">请输入显示顺序</small>
 		                    </div>
 		                </div>
 		                <div class="panel-footer">
@@ -46,6 +49,7 @@
 		                        <div class="col-sm-9 col-sm-offset-3">
 		                            <button class="btn btn-warning" type="reset">重置</button>
 		                            <button class="btn btn-mint" type="submit" >保存</button>
+		                            <button class="btn btn-default" type="button" onclick="doPjax('#(ctx)/admin/post/getListPage')">返回</button>
 		                        </div>
 		                    </div>
 		                </div>
@@ -53,6 +57,8 @@
 		        </div>
 		    </div>
 	</div>
+	<link href="#(ctx)/common/plugins/bootstrap-select/bootstrap-select.min.css" rel="stylesheet"/>
+	<script src="#(ctx)/common/plugins/bootstrap-select/bootstrap-select.min.js"></script>
 	<script>
 		function save(){
 			var data = common_ajax.ajaxFunc("/admin/post/save", $('#editForm').serialize(), "json", null);
@@ -62,42 +68,84 @@
 				});
 			}
 		}
+		function selectOneOrg(){
+			//调用选择一个单位组件
+			pointLion.selectOneOrg(function(orgNode){
+				var thisId = $("#orgId").val();//主键
+				if(thisId==orgNode.id){
+					 layer.closeAll();
+					 pointLion.alertMsg("您不能选择自己为父级节点!" , "warning" , "small" , null);
+					 return;
+				}
+				$("#orgName").val(orgNode.name);//所选单位名称
+				$("#orgId").val(orgNode.id);//所选单位id
+			});
+		}
+		
+		function getRank(){
+			var selectedRankId = $("input[name='rankid']").val();
+			$("#rankid").append('<option data-tokens="不限" value="">请选择职级</option>');
+			var data = common_ajax.ajaxFunc("/admin/rank/mapData","", "json", null);
+			for (var key in data) {
+				if(selectedRankId!='' && selectedRankId==key){
+					$("#rankid").append("<option data-tokens="+data[key]+" value="+key+" selected>"+ data[key] + "</option>");
+				}else{
+					$("#rankid").append("<option data-tokens="+data[key]+" value="+key+">"+ data[key] + "</option>");
+				}
+       		      
+            }
+           $('#rankid').selectpicker('refresh');
+		}
+
 		
 		$(document).ready(function() {
 		    	$('#editForm').bootstrapValidator({
 		            fields: {
-		            	"sysOrg.name": {
+		            	"sysPost.name": {
 		                    validators: {
 		                        notEmpty: {
-		                            message: '*机构名称不能为空'
+		                            message: '*岗位名称不能为空'
 		                        },
-		                        stringLength: {/*长度提示*/
+		                        stringLength: {
 		                            max: 25,
-		                            message: '*机构名称长度必须小于25'
+		                            message: '*岗位名称长度必须小于25'
 		                        }
 		                    }
 		                },
-		                "sysOrg.sort": {
+		                "sysPost.rankid": {
 		                    validators: {
-		                    	lessThan: {
-		        					inclusive:true,
-		        					value: 20,
-		        					message: '*请输入小于20的数字'
-		        				}
+		                    	 notEmpty: {  
+		                             message: '请选择职级'  
+		                         }  
 		                    }
 		                },
-		                "sysOrg.description": {
+		                "sysPost.sort": {
 		                    validators: {
-		                    	stringLength: {
-		                            max: 2000,
-		                            message: '*机构描述信息长度必须小于2000'
-		                        }
+		                    	 notEmpty: { 
+		                             message: '顺序不能为空'  
+		                         },  
+		                         stringLength: {
+		                             min: 1,  
+		                             max: 3,  
+		                             message: '必须输入小于等于999的正整数'  
+		                         },  
+		                         regexp: {
+		                             regexp: /^[1-9]+[0]*$/,  
+		                             message: '只能输入数字'  
+		                         },  
 		                    }
 		                }
 		            }
 		        }).on("success.form.bv", function (e) {
 		            save();
-		            return false;//阻止表单跳转
+		            return false;
+		        }).on("error.form.bv", function (e) {
+		            $("button[type='submit']").removeAttr("disabled");
 		        });
+		});
+		
+		
+		$(document).ready(function() {
+			getRank();//初始化职级
 		});
 	</script>

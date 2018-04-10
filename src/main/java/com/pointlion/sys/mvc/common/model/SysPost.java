@@ -1,6 +1,5 @@
 package com.pointlion.sys.mvc.common.model;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.jfinal.aop.Before;
@@ -9,8 +8,6 @@ import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.activerecord.tx.Tx;
-import com.pointlion.sys.mvc.common.dto.ZtreeNode;
-import com.pointlion.sys.mvc.common.model.base.BaseSysOrg;
 import com.pointlion.sys.mvc.common.model.base.BaseSysPost;
 
 /**
@@ -23,9 +20,16 @@ public class SysPost extends BaseSysPost<SysPost> {
 	/***
 	 * 根据主键查询
 	 */
-	public SysPost getById(String id){
-		return SysPost.dao.findById(id);
+	public SysPost getPostById(String id){
+		return SysPost.dao.findFirst("SELECT * from sys_post where id='"+id+"'");
 	}
+	/***
+	 * 根据职级id查询岗位
+	 */
+	public List<SysPost> getPostByRankId(String rankId){
+		return SysPost.dao.find("SELECT * from sys_post where rankid='"+rankId+"'");
+	}
+	
 	/***
 	 * 删除
 	 * @param ids
@@ -34,7 +38,7 @@ public class SysPost extends BaseSysPost<SysPost> {
 	public void deleteByIds(String ids){
     	String idarr[] = ids.split(",");
     	for(String id : idarr){
-    		SysPost o = SysPost.dao.getById(id);
+    		SysPost o = SysPost.dao.getPostById(id);
     		o.delete();
     	}
 	}

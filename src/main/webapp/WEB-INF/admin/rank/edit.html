@@ -1,0 +1,97 @@
+	#include("/common/include/pageTitleBread.html")
+	<div id="page-content">
+			<div class="col-lg-12">
+		        <div class="panel">
+		            <div class="panel-heading">
+		                <h3 class="panel-title">添加新职级</h3>
+		            </div>
+		            <form id="editForm" class="panel-body form-horizontal form-padding">
+		                <input type="hidden"  name="sysRank.id" class="form-control"  value="#(rank?rank.id:'')">
+		                <div class="form-group">
+		                    <label class="col-md-3 control-label" for="demo-text-input">职级名称</label>
+		                    <div class="col-md-9">
+		                        <input type="text"  name="sysRank.name" class="form-control"  value="#(rank?rank.name:'')">
+		                        <small class="help-block">请输入职级名称</small>
+		                    </div>
+		                </div>
+		                <div class="form-group">
+		                    <label class="col-md-3 control-label" for="demo-text-input">职级编码</label>
+		                    <div class="col-md-9">
+		                        <input type="text"  name="sysRank.namecode" class="form-control"  value="#(rank?rank.namecode:'')">
+		                        <small class="help-block">请输入职级编码</small>
+		                    </div>
+		                </div>
+		                <div class="form-group">
+		                    <label class="col-md-3 control-label" for="demo-textarea-input">描述信息</label>
+		                    <div class="col-md-9">
+		                        <textarea name="sysRank.description" rows="9" class="form-control">#(rank?rank.description:'')</textarea>
+		                        <small class="help-block">请输入机构的描述信息</small>
+		                    </div>
+		                </div>
+		                <div class="panel-footer">
+		                    <div class="row">
+		                        <div class="col-sm-9 col-sm-offset-3">
+		                            <button class="btn btn-warning" type="reset">重置</button>
+		                            <button class="btn btn-mint" type="submit" >保存</button>
+		                            <button class="btn btn-default" type="button" onclick="doPjax('#(ctx)/admin/rank/getListPage')">返回</button>
+		                        </div>
+		                    </div>
+		                </div>
+		            </form>
+		        </div>
+		    </div>
+	</div>
+	<script>
+		function save(){
+			var data = common_ajax.ajaxFunc("/admin/rank/save", $('#editForm').serialize(), "json", null);
+			if(data.success){
+				pointLion.alertMsg("保存成功!" , "success" , "small" , function(){
+					doPjax(ctx+'/admin/rank/getListPage');//跳转到列表页
+				});
+			}
+		}
+		
+		$(document).ready(function() {
+		    	$('#editForm').bootstrapValidator({
+		            fields: {
+		            	"sysRank.name": {
+		                    validators: {
+		                        notEmpty: {
+		                            message: '*名称不能为空'
+		                        },
+		                        stringLength: {/*长度提示*/
+		                            max: 25,
+		                            message: '*名称长度必须小于25'
+		                        }
+		                    }
+		                },
+		                "sysRank.namecode": {
+		                    validators: {
+		                    	 notEmpty: {
+		                            message: '*编码不能为空'
+		                        },
+		                        stringLength: {/*长度提示*/
+		                            max: 30,
+		                            message: '*名称长度必须小于30'
+		                        },
+		                        regexp: {//正则验证  
+		                            regexp: /^[a-zA-Z0-9_\.]+$/,  
+		                            message: '只能输入字母、数字、反斜杠、下划线、点'  
+		                        },
+		                    }
+		                },
+		                "sysOrg.description": {
+		                    validators: {
+		                    	stringLength: {
+		                            max: 2000,
+		                            message: '*描述信息长度必须小于2000'
+		                        }
+		                    }
+		                }
+		            }
+		        }).on("success.form.bv", function (e) {
+		            save();
+		            return false;//阻止表单跳转
+		        });
+		});
+	</script>

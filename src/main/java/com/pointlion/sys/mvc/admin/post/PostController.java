@@ -1,5 +1,6 @@
 package com.pointlion.sys.mvc.admin.post;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,9 +10,12 @@ import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 import com.pointlion.sys.interceptor.MainPageTitleInterceptor;
+import com.pointlion.sys.mvc.admin.login.SessionUtil;
 import com.pointlion.sys.mvc.common.base.BaseController;
 import com.pointlion.sys.mvc.common.model.SysOrg;
 import com.pointlion.sys.mvc.common.model.SysPost;
+import com.pointlion.sys.mvc.common.model.SysUser;
+import com.pointlion.sys.mvc.common.utils.DateUtil;
 import com.pointlion.sys.mvc.common.utils.UuidUtil;
 
 /**
@@ -28,7 +32,6 @@ public class PostController extends BaseController {
 	public void getListPage(){
     	render("/WEB-INF/admin/post/list.html");
     }
-   
     /***
      * 获取分页数据
      **/
@@ -47,28 +50,38 @@ public class PostController extends BaseController {
     	//添加和修改
     	String id = getPara("id");
     	if(StrKit.notBlank(id)){
-    		SysPost p = SysPost.dao.getById(id);
-    		SysOrg org = SysOrg.dao.getById(p.getOrgid());
-    		setAttr("post", p);
+    		SysPost post = SysPost.dao.getPostById(id);
+    		SysOrg org = SysOrg.dao.getById(post.getOrgid());
+    		setAttr("post", post);
     		setAttr("org", org);
     	}
-    	//添加子模块
-    	String parentid = getPara("parentid");
-    	if(StrKit.notBlank(parentid)){
-    		SysOrg parent = SysOrg.dao.getById(parentid);
-    		setAttr("p", parent);
-    	}
+    	//获取组织架构的根节点
+    	List<SysOrg> orgs = SysOrg.dao.getChildrenByPid("#root");
+		setAttr("rootOrg", orgs.get(0));
     	render("/WEB-INF/admin/post/edit.html");
     }
+    
+    public void getPostJsonById() {
+    	//添加和修改
+    	String id = getPara("id");
+    	SysPost post = null;
+    	if(StrKit.notBlank(id)){
+    		post = SysPost.dao.getPostById(id);
+    	}
+    	renderJson(post);
+    }
+    
     /***
      * 保存
      */
     public void save(){
-    	SysOrg o = getModel(SysOrg.class);
+    	SysPost o = getModel(SysPost.class);
     	if(StrKit.notBlank(o.getId())){
     		o.update();
     	}else{
     		o.setId(UuidUtil.getUUID());
+    		o.setCreateuser(SessionUtil.getUserIdFromSession(this.getRequest()));
+    		o.setCreateTime(DateUtil.getTime());
     		o.save();
     	}
     	renderSuccess();
@@ -91,9 +104,9 @@ public class PostController extends BaseController {
 		String ids = getPara("ids");
     	String idarr[] = ids.split(",");
     	for(String id : idarr){
-    		List<SysOrg> list = SysOrg.dao.getChildrenByPid(id);
+    		List<SysUser> list = SysUser.dao.getUserListByPostId(id);
     		if(list.size()>0){
-    			renderError("有子菜单,不允许删除!");
+    			renderError("该岗位下有用户，不能删除!");
     			return;
     		}
     	}
@@ -112,4 +125,5 @@ public class PostController extends BaseController {
 		pageTitleBread.put("breadHomeMethod", breadHomeMethod);
 		return pageTitleBread;
 	}
+	
 }
