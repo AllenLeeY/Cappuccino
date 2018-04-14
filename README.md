@@ -31,7 +31,7 @@
 ![image](https://github.com/AllenLeeY/JFinalOA/blob/master/src/main/webapp/common/img/readme/frient.png?raw=true)
 ![image](https://github.com/AllenLeeY/JFinalOA/blob/master/src/main/webapp/common/img/readme/clum.png?raw=true)
 
-##更新日志
+## 更新日志
  
  **2018年4月01日10:01:59**
 - 重构maven
