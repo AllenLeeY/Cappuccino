@@ -17,6 +17,7 @@ import com.jfinal.kit.PropKit;
 import com.jfinal.plugin.activerecord.ActiveRecordPlugin;
 import com.jfinal.plugin.activerecord.dialect.MysqlDialect;
 import com.jfinal.plugin.druid.DruidPlugin;
+import com.jfinal.plugin.redis.RedisPlugin;
 import com.jfinal.template.Engine;
 import com.pointlion.sys.handler.GlobalHandler;
 import com.pointlion.sys.interceptor.IfLoginInterceptor;
@@ -94,21 +95,33 @@ public class MainConfig extends JFinalConfig {
 	public void configPlugin(Plugins me) {
 		//配置数据库连接池插件
 		DruidPlugin druidPlugin =new DruidPlugin(PropKit.get("jdbcUrl"), PropKit.get("user"), PropKit.get("password"));
+		 //添加到插件列表中
+	    me.add(druidPlugin);
+	    
 		//orm映射 配置ActiveRecord插件
 		ActiveRecordPlugin arp=new ActiveRecordPlugin(druidPlugin);
 		arp.setShowSql(PropKit.getBoolean("devMode"));
 		arp.setDialect(new MysqlDialect());
 		_MappingKit.mapping(arp);
+		me.add(arp);
+		
 		ActivitiPlugin acitivitiPlugin = new ActivitiPlugin();
+		me.add(acitivitiPlugin);
+		
 		ShiroPlugin shiroPlugin = new ShiroPlugin(this.routes);
 	    shiroPlugin.setLoginUrl("/admin/login");//登陆url：未验证成功跳转
 	    shiroPlugin.setSuccessUrl("/admin/index");//登陆成功url：验证成功自动跳转
 	    shiroPlugin.setUnauthorizedUrl("/admin/login/needPermission");//授权url：未授权成功自动跳转
-	    //添加到插件列表中
-	    me.add(druidPlugin);
-	    me.add(arp);
-	    me.add(acitivitiPlugin);
 	    me.add(shiroPlugin);
+	   
+	    // 用于缓存sessionUser模块的redis服务
+	    RedisPlugin ressionRedis = new RedisPlugin("sessionUser",PropKit.get("redisIP"), Integer.parseInt(PropKit.get("redisPort")), PropKit.get("redisPWD"));
+	    me.add(ressionRedis);
+	 
+	    // 用于缓存news模块的redis服务
+	    RedisPlugin orgRedis = new RedisPlugin("org", PropKit.get("redisIP"),  Integer.parseInt(PropKit.get("redisPort")), PropKit.get("redisPWD"));
+	    me.add(orgRedis);
+	   
 	}
 	
 	/**

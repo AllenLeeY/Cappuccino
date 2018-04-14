@@ -10,10 +10,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
+import com.alibaba.fastjson.JSONArray;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
+import com.jfinal.plugin.redis.Cache;
+import com.jfinal.plugin.redis.Redis;
 import com.pointlion.sys.interceptor.MainPageTitleInterceptor;
 import com.pointlion.sys.mvc.common.base.BaseController;
 import com.pointlion.sys.mvc.common.dto.ZtreeNode;
@@ -25,6 +30,7 @@ import com.pointlion.sys.mvc.common.utils.UuidUtil;
  */
 @Before(MainPageTitleInterceptor.class)
 public class OrgController extends BaseController {
+	Logger logger = Logger.getLogger(OrgController.class);
 	/***
 	 * 获取列表页面
 	 */
@@ -35,17 +41,28 @@ public class OrgController extends BaseController {
      * 获取树
      */
     public void getOrgTree(){
-    	List<SysOrg> menuList = SysOrg.dao.getChildrenAll("#root");
-    	List<ZtreeNode> nodelist = SysOrg.dao.toZTreeNode(menuList,true,false);//数据库中的菜单
-    	List<ZtreeNode> rootList = new ArrayList<ZtreeNode>();//页面展示的,带根节点
-    	//声明根节点
-    	ZtreeNode root = new ZtreeNode();
-    	root.setId("#root");
-    	root.setName("组织结构");
-    	root.setChildren(nodelist);
-    	root.setOpen(true);
-    	rootList.add(root);
-    	renderJson(rootList);
+    	//获取redis缓存
+        Cache bbsCache = Redis.use("org");
+	    Object orgRedisObj = bbsCache.get("orgTree");
+	    if(orgRedisObj != null){
+	    	logger.info("----------------get orgTree from redis");
+	    	renderJson(orgRedisObj);
+	    }else{
+	    	List<SysOrg> menuList = SysOrg.dao.getChildrenAll("#root");
+	    	List<ZtreeNode> nodelist = SysOrg.dao.toZTreeNode(menuList,true,false);//数据库中的菜单
+	    	List<ZtreeNode> rootList = new ArrayList<ZtreeNode>();//页面展示的,带根节点
+	    	//声明根节点
+	    	ZtreeNode root = new ZtreeNode();
+	    	root.setId("#root");
+	    	root.setName("组织结构");
+	    	root.setChildren(nodelist);
+	    	root.setOpen(true);
+	    	rootList.add(root);
+	    	//添加缓存
+	    	logger.info("---------------- redis no orgTree Data,now! add a ZtreeNode Object to Redis key orgTree");
+	    	bbsCache.set("orgTree",JSONArray.toJSON(rootList));
+	    	renderJson(rootList);
+	    }
     }
     public void getOrgTreeOnlyLeaf(){
     	List<SysOrg> menuList = SysOrg.dao.getChildrenAll("#root");
